@@ -11,6 +11,13 @@ endif
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! s:has_localrc()
+  " The user may have disabled the plugin via :let g:loaded_localrc = 1.
+  " In this case, we must not invoke the localrc functions. The best way to
+  " check is to look for the autocmds installed by localrc.
+  return exists('#plugin-localrc#BufReadPost')
+endfunction
+
 " Execution order:
 " 1. global localrc configuration
 " 2. Vim ftplugins
@@ -22,7 +29,10 @@ augroup filetypeplugin
 
   " Execute global localrc configuration before Vim ftplugins.
   autocmd FileType *
-  \   if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif
+  \   if s:has_localrc() && !exists('b:localrc_done') |
+  \     call localrc#load(g:localrc_filename) |
+  \     let b:localrc_done = 1 |
+  \   endif
 augroup END
 
 " Restore the autocmd from ftplugin.vim; we have to invoke it because it
@@ -36,10 +46,12 @@ runtime ftplugin.vim
 " Handle filetype-specific localrc configuration after Vim ftplugins.
 augroup filetypeplugin
   autocmd FileType *
-  \   call localrc#loadft(
-  \     type(g:localrc_filetype) == type([]) ? copy(g:localrc_filetype)
-  \                                          : [g:localrc_filetype],
-  \     expand("<amatch>"))
+  \   if s:has_localrc() |
+  \     call localrc#loadft(
+  \       type(g:localrc_filetype) == type([]) ? copy(g:localrc_filetype)
+  \                                            : [g:localrc_filetype],
+  \       expand("<amatch>")) |
+  \   endif
 augroup END
 
 
