@@ -23,8 +23,15 @@ endif
 
 augroup plugin-localrc
   autocmd!
-  autocmd BufNewFile,BufReadPost * call localrc#load(g:localrc_filename)
+  " Depending on the circumstances, the FileType autocmd may execute before
+  " BufReadPost (automatic filetype detection) or after BufReadPost (filetype
+  " set manually or via modeline). Use a flag to ensure that global localrc is
+  " always executed before the filetype-specific ones, so that they can override
+  " global localrc settings.
+  autocmd BufReadPre * unlet! b:localrc_done " Clear to support reload via :edit!.
+  autocmd BufNewFile,BufReadPost * if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif
   autocmd FileType *
+  \   if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif |
   \   call localrc#load(
   \     map(type(g:localrc_filetype) == type([]) ? copy(g:localrc_filetype)
   \                                              : [g:localrc_filetype],
