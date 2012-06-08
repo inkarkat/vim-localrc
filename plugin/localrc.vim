@@ -28,8 +28,10 @@ augroup plugin-localrc
   " set manually or via modeline). Use a flag to ensure that global localrc is
   " always executed before the filetype-specific ones, so that they can override
   " global localrc settings.
-  autocmd BufReadPre * unlet! b:localrc_done " Clear to support reload via :edit!.
-  autocmd BufNewFile,BufReadPost * if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif
+  " Local settings may be set dynamically based on the filename. Therefore, also
+  " hook into file renamings via :file and :saveas.
+  autocmd BufReadPre,BufFilePre * unlet! b:localrc_done " Clear to support reload via :edit! / file renamings via :file and :saveas.
+  autocmd BufNewFile,BufReadPost,BufFilePost * if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif
 augroup END
 
 
