@@ -34,12 +34,6 @@ augroup plugin-localrc
   autocmd BufReadPre * unlet! b:localrc_done " Clear to support reload via :edit!.
   autocmd BufNewFile,BufReadPost * nested
   \   if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif
-  autocmd FileType * nested
-  \   if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif |
-  \   call localrc#loadft(
-  \     type(g:localrc_filetype) == type([]) ? copy(g:localrc_filetype)
-  \                                          : [g:localrc_filetype],
-  \     expand("<amatch>"))
 augroup END
 
 
