@@ -4,6 +4,10 @@
 " License: Creative Commons Attribution 2.1 Japan License
 "          <http://creativecommons.org/licenses/by/2.1/jp/deed.en>
 
+if v:version < 700
+  finish
+endif
+
 let s:save_cpo = &cpo
 set cpo&vim
 
