@@ -72,6 +72,11 @@ function! localrc#search(fnames, ...)
   return targets
 endfunction
 
+function! s:combine_path(path1, path2)
+    let sep = (exists('+shellslash') && ! &shellslash ? '\' : '/')
+    return a:path1 . sep . substitute(a:path2, '^[/\\]', '', '')
+endfunction
+
 function! s:match_files(path, fname)
   if type(a:fname) == type([])
     let files = []
@@ -83,8 +88,8 @@ function! s:match_files(path, fname)
 
   let path = escape(a:path, '*?[,')
   if a:fname[0] == '/'
-    let files = split(globpath(path, '/.*', 1), "\n")
-    \         + split(globpath(path, '/*' , 1), "\n")
+    let files = split(globpath(path, '.[^.]*', 1), "\n")
+    \         + split(globpath(path, '*' , 1), "\n")
     let pat = a:fname[1:]
     call filter(map(files, 'fnamemodify(v:val, ":t")'), 'v:val =~# pat')
 
@@ -93,7 +98,7 @@ function! s:match_files(path, fname)
     \               'fnamemodify(v:val, ":t")')
   endif
 
-  return filter(map(files, 'a:path . "/" . v:val'), 'filereadable(v:val)')
+  return filter(map(files, 's:combine_path(a:path, v:val)'), 'filereadable(v:val)')
 endfunction
 
 " - string only.
