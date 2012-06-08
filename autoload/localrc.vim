@@ -8,6 +8,10 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! localrc#loadft(templnames, ft)
+  if empty(a:ft)
+    return
+  endif
+
   " The 'filetype' setting can consist of multiple filetypes, separated by a
   " dot, e.g. "foo.bar". Settings for subsequent filetypes override earlier
   " ones, so execute filetype-specific localrc files in this order:
@@ -33,8 +37,17 @@ function! localrc#load(fnames, ...)
   for file in localrc#search(a:fnames,
   \                          1 <= a:0 ? a:1 : expand('%:p:h'),
   \                          2 <= a:0 ? a:2 : -1)
-    " XXX: Handle error?
-    source `=file`
+    try
+      execute 'source' fnameescape(file)
+    catch /^Vim\%((\a\+)\)\=:E/
+      " v:exception contains what is normally in v:errmsg, but with extra
+      " exception source info prepended, which we cut away.
+      let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
+      echohl ErrorMsg
+      echomsg printf('Error detected while processing %s:', file)
+      echomsg v:errmsg
+      echohl None
+    endtry
   endfor
 endfunction
 
