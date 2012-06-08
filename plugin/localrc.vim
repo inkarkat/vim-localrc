@@ -3,7 +3,7 @@
 " Author : thinca <thinca+vim@gmail.com>
 " License: zlib License
 
-if exists('g:loaded_localrc')
+if exists('g:loaded_localrc') || v:version < 700
   finish
 endif
 let g:loaded_localrc = 1
