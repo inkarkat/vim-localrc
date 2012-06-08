@@ -7,6 +7,27 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+function! localrc#loadft(templnames, ft)
+  " The 'filetype' setting can consist of multiple filetypes, separated by a
+  " dot, e.g. "foo.bar". Settings for subsequent filetypes override earlier
+  " ones, so execute filetype-specific localrc files in this order:
+  " foo, bar, foo.bar
+  let ftparts = split(a:ft, '\.')
+  for combination in range(1, len(ftparts) - 1)
+    call add(ftparts, join(ftparts[0:combination], '.'))
+  endfor
+
+  for ftpart in ftparts
+    " The ordering of filetypes has higher precendence than the configuration
+    " file's level in the file system hierarchy, so execute the loading (which
+    " executes all matches in each step in the hierarcy together) separately for
+    " each filetype part.
+    "
+    " Note: If fname is a regular expression, the filetype separator "." must be
+    " escaped.
+    call localrc#load(map(copy(a:templnames), 'printf(v:val, (v:val[0] == "/" ? escape(ftpart, ".") : ftpart))'))
+  endfor
+endfunction
 
 function! localrc#load(fnames, ...)
   for file in localrc#search(a:fnames,

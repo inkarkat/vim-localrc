@@ -40,7 +40,14 @@ The configuration file is a Vim script of a decided file name like .vimrc.
 The file name is specified by |g:localrc_filename|.
 
 Configuration file applied only to a specific filetype can be put.  The file
-name is specified by |g:localrc_filetype|.
+name is specified by |g:localrc_filetype|.  Filetype-specific configuration is
+always executed _after_ the global configuration, so you can override global
+stuff in there.  (The filetype may have already been set during execution of
+the global configuration, but not when set manually or from a modeline, so
+it's advisable to use the specific configuration files instead of handling all
+filetypes in the global one.)  For a compound filetype like "foo.bar",
+configuration for "foo", "bar", and "foo.bar" is searched.
+
 
 When two or more configuration files exist, it is sequentially loaded from a
 shallow hierarchy.

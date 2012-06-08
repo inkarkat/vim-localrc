@@ -32,10 +32,10 @@ augroup plugin-localrc
   autocmd BufNewFile,BufReadPost * if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif
   autocmd FileType *
   \   if !exists('b:localrc_done') | call localrc#load(g:localrc_filename) | let b:localrc_done = 1 | endif |
-  \   call localrc#load(
-  \     map(type(g:localrc_filetype) == type([]) ? copy(g:localrc_filetype)
-  \                                              : [g:localrc_filetype],
-  \         'printf(v:val, expand("<amatch>"))'))
+  \   call localrc#loadft(
+  \     type(g:localrc_filetype) == type([]) ? copy(g:localrc_filetype)
+  \                                          : [g:localrc_filetype],
+  \     expand("<amatch>"))
 augroup END
 
 
