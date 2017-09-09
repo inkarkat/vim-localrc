@@ -38,7 +38,7 @@ function! localrc#load(fnames, ...)
   \                          2 <= a:0 ? a:2 : -1)
     try
       execute 'source' fnameescape(file)
-    catch /^Vim\%((\a\+)\)\=:E/
+    catch /^Vim\%((\a\+)\)\=:/
       " v:exception contains what is normally in v:errmsg, but with extra
       " exception source info prepended, which we cut away.
       let v:errmsg = substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '')
